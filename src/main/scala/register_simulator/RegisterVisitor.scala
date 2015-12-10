@@ -35,11 +35,11 @@ class RegisterVisitor extends RegisterSimulatorVisitor[Unit] {
       new Label(generateInt(ctx.LABEL(1))), new Label(generateInt(ctx.LABEL(2)))))
   }
 
-  override def visitTerminal(terminalNode: TerminalNode): Unit = ???
+  override def visitTerminal(terminalNode: TerminalNode): Unit = {}
 
-  override def visitChildren(ruleNode: RuleNode): Unit = ???
+  override def visitChildren(ruleNode: RuleNode): Unit = {}
 
-  override def visitErrorNode(errorNode: ErrorNode): Unit = ???
+  override def visitErrorNode(errorNode: ErrorNode): Unit = {}
 
   override def visit(parseTree: ParseTree): Unit = {
     parseTree match {

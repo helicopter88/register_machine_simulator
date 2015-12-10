@@ -15,3 +15,4 @@ fragment NUMBER: DIGIT+;
 REGISTER: 'R'NUMBER;
 LABEL:   'L'NUMBER;
 HALT: 'HALT';
+WS: [ \n\t\r]+ -> skip;
