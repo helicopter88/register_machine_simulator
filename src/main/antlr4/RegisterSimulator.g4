@@ -5,9 +5,9 @@ grammar RegisterSimulator;
 }
 
 program: (instruction)* EOF;
-instruction: LABEL':' REGISTER '+' LABEL |
-             LABEL':' REGISTER '-' LABEL','LABEL |
-             LABEL':' HALT
+instruction: LABEL':' REGISTER '+' LABEL |         # Increment => IncrementNode
+             LABEL':' REGISTER '-' LABEL','LABEL | # Decrement => DecrementNode
+             LABEL':' HALT                         # Halt      => HaltNode
              ;
 
 fragment DIGIT: [0-9];
