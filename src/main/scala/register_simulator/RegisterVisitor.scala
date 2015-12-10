@@ -1,9 +1,10 @@
 package register_simulator
 
 import org.antlr.v4.runtime.tree._
+import register_simulator.RegisterSimulatorParser.{ProgramContext, IncrementContext, DecrementContext, HaltContext}
 import register_simulator.nodes.{DecrementNode, HaltNode, IncrementNode, Instruction}
-
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 
 /**
@@ -14,23 +15,24 @@ class RegisterVisitor extends RegisterSimulatorVisitor[Unit] {
     Integer.parseInt(terminalNode.getText.substring(1))
   }
 
-  val labels = new ArrayBuffer[Label]
+  val labels = new mutable.HashMap[Label, Instruction]
 
-  override def visitProgram(ctx: RegisterSimulatorParser.ProgramContext): Unit = ???
+  override def visitProgram(ctx: RegisterSimulatorParser.ProgramContext): Unit = {
+    ctx.instruction().foreach(elem => visit(elem))
+  }
 
-  override def visitInstruction(ctx: RegisterSimulatorParser.InstructionContext): Unit = {
-    val labelNumber = generateInt(ctx.LABEL(0))
-    var instruction: Instruction = null
-    if (ctx.HALT() != null) {
-      instruction = new HaltNode
-    } else {
-      if (ctx.getText.contains("-")) instruction =
-        new DecrementNode(new Register(generateInt(ctx.REGISTER())), new Label(generateInt(ctx.LABEL(1))),
-          new Label(generateInt(ctx.LABEL(2))))
-      if (ctx.getText.contains("+")) instruction =
-        new IncrementNode(new Register(generateInt(ctx.REGISTER())), new Label(generateInt(ctx.LABEL(1))))
+  override def visitHalt(ctx: RegisterSimulatorParser.HaltContext): Unit = {
+    labels.put(new Label(generateInt(ctx.LABEL())), new HaltNode)
+  }
 
-    }
+  override def visitIncrement(ctx: RegisterSimulatorParser.IncrementContext): Unit = {
+    labels.put(new Label(generateInt(ctx.LABEL(0))), new IncrementNode(new Register(generateInt(ctx.REGISTER())),
+      new Label(generateInt(ctx.LABEL(1)))))
+  }
+
+  override def visitDecrement(ctx: RegisterSimulatorParser.DecrementContext): Unit = {
+    labels.put(new Label(generateInt(ctx.LABEL(0))), new DecrementNode(new Register(generateInt(ctx.REGISTER())),
+      new Label(generateInt(ctx.LABEL(1))), new Label(generateInt(ctx.LABEL(2)))))
   }
 
   override def visitTerminal(terminalNode: TerminalNode): Unit = ???
@@ -39,5 +41,12 @@ class RegisterVisitor extends RegisterSimulatorVisitor[Unit] {
 
   override def visitErrorNode(errorNode: ErrorNode): Unit = ???
 
-  override def visit(parseTree: ParseTree): Unit = ???
+  override def visit(parseTree: ParseTree): Unit = {
+    parseTree match {
+      case node: ProgramContext => visitProgram(node)
+      case node: HaltContext => visitHalt(node)
+      case node: DecrementContext => visitDecrement(node)
+      case node: IncrementContext => visitIncrement(node)
+    }
+  }
 }
