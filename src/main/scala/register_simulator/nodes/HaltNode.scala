@@ -5,4 +5,5 @@ package register_simulator.nodes
   */
 class HaltNode extends Instruction {
 
+  override def execute() = {}
 }

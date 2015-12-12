@@ -1,10 +1,21 @@
 package register_simulator.nodes
 
-import register_simulator.{Label, Register}
+import register_simulator.{Instructions, RegisterMachine, Label, Register}
 
-/**
-  * Created by Domenico on 10/12/2015.
-  */
-class IncrementNode(register: Register, next: Label) extends Instruction {
+class IncrementNode(val register: Register, val next: Label) extends Instruction {
 
+  override def execute(): Unit = {
+    lazy val stateOp = RegisterMachine.regMachine.get(register)
+
+    if (stateOp.isEmpty)
+      RegisterMachine.regMachine.put(register, 1)
+    else
+      RegisterMachine.regMachine.update(register, stateOp.get + 1)
+
+    if (Instructions.instructions.isDefinedAt(next.index)) {
+      val nextInstruction = Instructions.instructions.apply(next.index)
+      nextInstruction.execute()
+    } else
+      println("Attempted to access undefined label")
+  }
 }

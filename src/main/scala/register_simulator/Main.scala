@@ -4,9 +4,8 @@ import java.io._
 
 import org.antlr.v4.runtime.{CommonTokenStream, ANTLRFileStream}
 
-/**
-  * Created by domenico on 10/12/15.
-  */
+import scala.collection.mutable
+
 object Main extends App {
   val bri = new BufferedReader(new InputStreamReader(System.in))
   val bro = new BufferedWriter(new FileWriter("in.txt"))
@@ -21,8 +20,10 @@ object Main extends App {
   val tokens = new CommonTokenStream(new RegisterSimulatorLexer(new ANTLRFileStream(file)))
   val fileParser = new RegisterSimulatorParser(tokens)
   val registerVisitor = new RegisterVisitor
-  val instructions = registerVisitor.visit(fileParser.program())
-  println(instructions)
-  // and then delete it
+  Instructions.instructions = registerVisitor.visit(fileParser.program()).toList
+
+  Instructions.instructions.head.execute()
+  println(RegisterMachine.regMachine)
+
   new File(file).delete
 }

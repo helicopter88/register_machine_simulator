@@ -7,16 +7,10 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-
-/**
-  * Created by domenico on 10/12/15.
-  */
 class RegisterVisitor extends RegisterSimulatorVisitor[mutable.Buffer[Instruction]] {
   private def generateInt(terminalNode: TerminalNode): Int = {
     Integer.parseInt(terminalNode.getText.substring(1))
   }
-
-  val labels = new mutable.HashMap[Label, Instruction]
 
   override def visitProgram(ctx: RegisterSimulatorParser.ProgramContext): mutable.Buffer[Instruction] = {
     ctx.instruction().flatMap(elem => visit(elem))
