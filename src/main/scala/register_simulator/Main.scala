@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.{CommonTokenStream, ANTLRFileStream}
 import scala.collection.mutable
 
 object Main extends App {
+  // --encode
   val bri = new BufferedReader(new InputStreamReader(System.in))
   val bro = new BufferedWriter(new FileWriter("in.txt"))
   var line = bri.readLine
@@ -22,8 +23,12 @@ object Main extends App {
   val registerVisitor = new RegisterVisitor
   Instructions.instructions = registerVisitor.visit(fileParser.program()).toList
 
-  Instructions.instructions.head.execute()
   println(RegisterMachine.regMachine)
 
+
+  //println(Instructions.decodeProgram(""))
+
   new File(file).delete
+  Instructions.instructions.head.execute()
+
 }

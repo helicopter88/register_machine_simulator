@@ -4,6 +4,7 @@ import register_simulator.{Instructions, RegisterMachine, Label, Register}
 
 class DecrementNode(val register: Register, val possible: Label, val impossible: Label) extends Instruction {
 
+  println(s"$register- -> ${possible.index}, $impossible")
   override def execute(): Unit = {
     var stateOp = RegisterMachine.regMachine.get(register)
 

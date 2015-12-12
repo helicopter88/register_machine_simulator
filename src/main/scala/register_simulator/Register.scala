@@ -1,7 +1,7 @@
 package register_simulator
 
 class Register(val index: Int) {
-  override def toString = s"r$index"
+  override def toString = s"R$index"
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[Register]
 

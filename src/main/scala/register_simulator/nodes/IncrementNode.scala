@@ -4,6 +4,8 @@ import register_simulator.{Instructions, RegisterMachine, Label, Register}
 
 class IncrementNode(val register: Register, val next: Label) extends Instruction {
 
+  println(s"$register- -> $next")
+
   override def execute(): Unit = {
     lazy val stateOp = RegisterMachine.regMachine.get(register)
 
