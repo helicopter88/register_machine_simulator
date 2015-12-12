@@ -5,48 +5,50 @@ import register_simulator.RegisterSimulatorParser.{ProgramContext, IncrementCont
 import register_simulator.nodes.{DecrementNode, HaltNode, IncrementNode, Instruction}
 import scala.collection.JavaConversions._
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 
 /**
   * Created by domenico on 10/12/15.
   */
-class RegisterVisitor extends RegisterSimulatorVisitor[Unit] {
+class RegisterVisitor extends RegisterSimulatorVisitor[mutable.Buffer[Instruction]] {
   private def generateInt(terminalNode: TerminalNode): Int = {
     Integer.parseInt(terminalNode.getText.substring(1))
   }
 
   val labels = new mutable.HashMap[Label, Instruction]
 
-  override def visitProgram(ctx: RegisterSimulatorParser.ProgramContext): Unit = {
-    ctx.instruction().foreach(elem => visit(elem))
+  override def visitProgram(ctx: RegisterSimulatorParser.ProgramContext): mutable.Buffer[Instruction] = {
+    ctx.instruction().flatMap(elem => visit(elem))
   }
 
-  override def visitHalt(ctx: RegisterSimulatorParser.HaltContext): Unit = {
-    labels.put(new Label(generateInt(ctx.LABEL())), new HaltNode)
+  override def visitHalt(ctx: RegisterSimulatorParser.HaltContext):  mutable.Buffer[Instruction] = {
+    mutable.Buffer[Instruction](new HaltNode)
   }
 
-  override def visitIncrement(ctx: RegisterSimulatorParser.IncrementContext): Unit = {
-    labels.put(new Label(generateInt(ctx.LABEL(0))), new IncrementNode(new Register(generateInt(ctx.REGISTER())),
+  override def visitIncrement(ctx: RegisterSimulatorParser.IncrementContext): mutable.Buffer[Instruction] = {
+    mutable.Buffer[Instruction](new IncrementNode(new Register(generateInt(ctx.REGISTER())),
       new Label(generateInt(ctx.LABEL(1)))))
   }
 
-  override def visitDecrement(ctx: RegisterSimulatorParser.DecrementContext): Unit = {
-    labels.put(new Label(generateInt(ctx.LABEL(0))), new DecrementNode(new Register(generateInt(ctx.REGISTER())),
+  override def visitDecrement(ctx: RegisterSimulatorParser.DecrementContext): mutable.Buffer[Instruction] = {
+    mutable.Buffer[Instruction](new DecrementNode(new Register(generateInt(ctx.REGISTER())),
       new Label(generateInt(ctx.LABEL(1))), new Label(generateInt(ctx.LABEL(2)))))
   }
 
-  override def visitTerminal(terminalNode: TerminalNode): Unit = {}
+  override def visitTerminal(terminalNode: TerminalNode) = null
 
-  override def visitChildren(ruleNode: RuleNode): Unit = {}
+  override def visitChildren(ruleNode: RuleNode):  mutable.Buffer[Instruction] = null
 
-  override def visitErrorNode(errorNode: ErrorNode): Unit = {}
+  override def visitErrorNode(errorNode: ErrorNode):  mutable.Buffer[Instruction] = null
 
-  override def visit(parseTree: ParseTree): Unit = {
+  override def visit(parseTree: ParseTree):  mutable.Buffer[Instruction] = {
+    val buffer = new ArrayBuffer[Instruction]()
     parseTree match {
-      case node: ProgramContext => visitProgram(node)
-      case node: HaltContext => visitHalt(node)
-      case node: DecrementContext => visitDecrement(node)
-      case node: IncrementContext => visitIncrement(node)
+      case node: ProgramContext => buffer ++= visitProgram(node)
+      case node: HaltContext => buffer ++= visitHalt(node)
+      case node: DecrementContext => buffer ++= visitDecrement(node)
+      case node: IncrementContext => buffer ++= visitIncrement(node)
     }
   }
 }

@@ -17,15 +17,12 @@ object Main extends App {
   }
   bro.close()
 
-  // We always want to debug with input stream
-  //val file = new File("out.s")
-
   val file = "in.txt"
   val tokens = new CommonTokenStream(new RegisterSimulatorLexer(new ANTLRFileStream(file)))
-  val waccParser = new RegisterSimulatorParser(tokens)
-  val syntaxTreeVisitor = new RegisterVisitor
-  val astNode = syntaxTreeVisitor.visit(waccParser.program())
-
+  val fileParser = new RegisterSimulatorParser(tokens)
+  val registerVisitor = new RegisterVisitor
+  val instructions = registerVisitor.visit(fileParser.program())
+  println(instructions)
   // and then delete it
   new File(file).delete
 }
