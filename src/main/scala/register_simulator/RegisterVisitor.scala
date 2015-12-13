@@ -8,23 +8,40 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class RegisterVisitor extends RegisterSimulatorVisitor[mutable.Buffer[Instruction]] {
+
   private def generateInt(terminalNode: TerminalNode): Int = {
     Integer.parseInt(terminalNode.getText.substring(1))
   }
 
+  /**
+    * Visits a program node
+    * @param ctx the parse tree
+    *   */
   override def visitProgram(ctx: RegisterSimulatorParser.ProgramContext): mutable.Buffer[Instruction] = {
     ctx.instruction().flatMap(elem => visit(elem))
   }
 
+  /**
+    * Visits a halt node
+    * @param ctx the parse tree
+    *     */
   override def visitHalt(ctx: RegisterSimulatorParser.HaltContext):  mutable.Buffer[Instruction] = {
     mutable.Buffer[Instruction](new HaltNode)
   }
 
+  /**
+    * Visits an increment node
+    * @param ctx the parse tree
+    *     */
   override def visitIncrement(ctx: RegisterSimulatorParser.IncrementContext): mutable.Buffer[Instruction] = {
     mutable.Buffer[Instruction](new IncrementNode(new Register(generateInt(ctx.REGISTER())),
       new Label(generateInt(ctx.LABEL(1)))))
   }
 
+  /**
+    * Visits a decrement node
+    * @param ctx the parse tree
+    *     */
   override def visitDecrement(ctx: RegisterSimulatorParser.DecrementContext): mutable.Buffer[Instruction] = {
     mutable.Buffer[Instruction](new DecrementNode(new Register(generateInt(ctx.REGISTER())),
       new Label(generateInt(ctx.LABEL(1))), new Label(generateInt(ctx.LABEL(2)))))

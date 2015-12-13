@@ -41,11 +41,11 @@ object Main {
       val fileParser = new RegisterSimulatorParser(tokens)
       val registerVisitor = new RegisterVisitor
       Instructions.instructions = new LinkedList[Instruction](registerVisitor.visit(fileParser.program()))
-      println(Encoder.encodeProgram(Instructions.instructions))
+      println(s"Encoded instructions: ${Encoder.encodeProgram(Instructions.instructions)}")
     }
 
     if (decode)
-      println(Decoder.decodeProgram(number))
+      println(s"Decoded instructions: \n${Decoder.decodeProgram(number)}")
 
 
     Instructions.instructions.head.execute()
