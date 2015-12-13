@@ -1,10 +1,10 @@
 package register_simulator.nodes
 
-import register_simulator.{Instructions, RegisterMachine, Label, Register}
+import register_simulator.{Label, Register, RegisterMachine}
 
 class DecrementNode(val register: Register, val possible: Label, val impossible: Label) extends Instruction {
 
-  println(s"$register- -> ${possible.index}, $impossible")
+  println(s"$register- -> $possible, $impossible")
   override def execute(): Unit = {
     var stateOp = RegisterMachine.regMachine.get(register)
 
@@ -20,15 +20,6 @@ class DecrementNode(val register: Register, val possible: Label, val impossible:
     } else {
       executeNextLabel(impossible)
     }
-  }
-
-  private def executeNextLabel(next: Label) = {
-
-    if (Instructions.instructions.size < next.index) {
-      val nextInstruction = Instructions.instructions.apply(next.index)
-      nextInstruction.execute()
-    } else
-      println("Attempted to access undefined label")
   }
 }
 

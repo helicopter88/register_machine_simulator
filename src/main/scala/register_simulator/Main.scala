@@ -2,35 +2,53 @@ package register_simulator
 
 import java.io._
 
-import org.antlr.v4.runtime.{CommonTokenStream, ANTLRFileStream}
+import org.antlr.v4.runtime.{ANTLRFileStream, ANTLRInputStream, CommonTokenStream}
 import register_simulator.nodes.Instruction
-import register_simulator.utils.LinkedList
+import register_simulator.utils.{Decoder, Encoder, LinkedList}
 
-object Main extends App {
-  // --encode
-  val bri = new BufferedReader(new InputStreamReader(System.in))
-  val bro = new BufferedWriter(new FileWriter("in.txt"))
-  var line = bri.readLine
-  while (line != null) {
-    bro.write(line + "\n")
-    line = bri.readLine
+object Main {
+  var encode = true
+  var decode = false
+  var fileName: ANTLRInputStream = new ANTLRInputStream(System.in)
+  var number = "0"
+
+  private def parseArgs(args: Array[String]): Unit = {
+
+    for (arg <- args) {
+      arg match {
+        case "-e" | "--encode" =>
+          decode = false
+          encode = true
+        case "-d" | "--decode" =>
+          decode = true
+          encode = false
+        // If the line contains a separator, it probably is a path
+        case str if str.contains(File.separator) =>
+          encode = true
+          fileName = new ANTLRFileStream(str)
+        // otherwise, it probably is just the number we want to decode
+        case str =>
+          decode = true
+          number = str
+      }
+    }
   }
-  bro.close()
 
-  val file = "in.txt"
-  val tokens = new CommonTokenStream(new RegisterSimulatorLexer(new ANTLRFileStream(file)))
-  val fileParser = new RegisterSimulatorParser(tokens)
-  val registerVisitor = new RegisterVisitor
-  Instructions.instructions = new LinkedList[Instruction](registerVisitor.visit(fileParser.program()))
+  def main(args: Array[String]) {
+    parseArgs(args)
+    if (encode) {
+      val tokens = new CommonTokenStream(new RegisterSimulatorLexer(fileName))
+      val fileParser = new RegisterSimulatorParser(tokens)
+      val registerVisitor = new RegisterVisitor
+      Instructions.instructions = new LinkedList[Instruction](registerVisitor.visit(fileParser.program()))
+      println(Encoder.encodeProgram(Instructions.instructions))
+    }
 
-  println(Instructions.encodeProgram(Instructions.instructions))
+    if (decode)
+      println(Decoder.decodeProgram(number))
 
-  //println(RegisterMachine.regMachine)
 
-
-  //println(Instructions.decodeProgram(""))
-
-  new File(file).delete
-  Instructions.instructions.head.execute()
-
+    Instructions.instructions.head.execute()
+    println(RegisterMachine.regMachine)
+  }
 }

@@ -1,10 +1,10 @@
 package register_simulator.nodes
 
-import register_simulator.{Instructions, RegisterMachine, Label, Register}
+import register_simulator.{Label, Register, RegisterMachine}
 
 class IncrementNode(val register: Register, val next: Label) extends Instruction {
 
-  println(s"$register- -> $next")
+  println(s"$register+ -> $next")
 
   override def execute(): Unit = {
     lazy val stateOp = RegisterMachine.regMachine.get(register)
@@ -14,10 +14,6 @@ class IncrementNode(val register: Register, val next: Label) extends Instruction
     else
       RegisterMachine.regMachine.update(register, stateOp.get + 1)
 
-    if (Instructions.instructions.size < next.index) {
-      val nextInstruction = Instructions.instructions.apply(next.index)
-      nextInstruction.execute()
-    } else
-      println("Attempted to access undefined label")
+    executeNextLabel(next)
   }
 }
