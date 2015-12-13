@@ -11,7 +11,6 @@ trait Instruction {
       val nextInstruction = Instructions.instructions.apply(next.index)
       nextInstruction.execute()
     } else
-      println(Instructions.instructions.size)
-    println("Attempted to access undefined label")
+      println("Attempted to access undefined label")
   }
 }
