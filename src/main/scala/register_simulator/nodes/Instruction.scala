@@ -7,7 +7,7 @@ trait Instruction {
   def execute()
 
   protected def executeNextLabel(next: Label) = {
-    if (Instructions.instructions.size < next.index) {
+    if (Instructions.instructions.size > next.index) {
       val nextInstruction = Instructions.instructions.apply(next.index)
       nextInstruction.execute()
     } else

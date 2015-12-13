@@ -4,7 +4,8 @@ import register_simulator.{Label, Register, RegisterMachine}
 
 class DecrementNode(val register: Register, val possible: Label, val impossible: Label) extends Instruction {
 
-  println(s"$register- -> $possible, $impossible")
+  override def toString = s"$register- -> $possible, $impossible"
+
   override def execute(): Unit = {
     var stateOp = RegisterMachine.regMachine.get(register)
 

@@ -3,7 +3,7 @@ package register_simulator.utils
 import register_simulator.nodes.{DecrementNode, IncrementNode, HaltNode, Instruction}
 
 object Encoder {
-  private def encodeDoublePair(pair: (BigInt, BigInt)) = (BigInt.apply(2) ^ pair._1) * (pair._2 * 2 + 1)
+  private def encodeDoublePair(pair: (BigInt, BigInt)) = BigInt.apply(2).pow(pair._1.toInt) * (pair._2 * 2 + 1)
 
   private def encodeSinglePair(pair: (BigInt, BigInt)) = encodeDoublePair(pair) - 1
 
