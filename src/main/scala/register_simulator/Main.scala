@@ -3,8 +3,8 @@ package register_simulator
 import java.io._
 
 import org.antlr.v4.runtime.{CommonTokenStream, ANTLRFileStream}
-
-import scala.collection.mutable
+import register_simulator.nodes.Instruction
+import register_simulator.utils.LinkedList
 
 object Main extends App {
   // --encode
@@ -21,9 +21,11 @@ object Main extends App {
   val tokens = new CommonTokenStream(new RegisterSimulatorLexer(new ANTLRFileStream(file)))
   val fileParser = new RegisterSimulatorParser(tokens)
   val registerVisitor = new RegisterVisitor
-  Instructions.instructions = registerVisitor.visit(fileParser.program()).toList
+  Instructions.instructions = new LinkedList[Instruction](registerVisitor.visit(fileParser.program()))
 
-  println(RegisterMachine.regMachine)
+  println(Instructions.encodeProgram(Instructions.instructions))
+
+  //println(RegisterMachine.regMachine)
 
 
   //println(Instructions.decodeProgram(""))

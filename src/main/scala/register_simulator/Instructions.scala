@@ -5,17 +5,17 @@ import register_simulator.utils.LinkedList
 
 object Instructions {
 
-  var instructions: List[Instruction] = Nil
+  var instructions = new LinkedList[Instruction]
 
-  def decodeDoubleNumToPair(program: BigInt) = {
-    decodeNumToPair(program)
+  private def decodeDoublePair(program: BigInt) = {
+    decodePair(program)
   }
 
-  def decodeSingleNumToPair(program: BigInt) = {
-    decodeNumToPair(program + 1)
+  private def decodeSinglePair(program: BigInt) = {
+    decodePair(program + 1)
   }
 
-  private def decodeNumToPair(program: BigInt) = {
+  private def decodePair(program: BigInt) = {
     var value = program
     var x = BigInt.apply(0)
 
@@ -29,36 +29,66 @@ object Instructions {
     (x, value)
   }
 
-  def decodeNumToList(program: BigInt): LinkedList[BigInt] = {
+  private def decodeList(program: BigInt): LinkedList[BigInt] = {
     lazy val result = new LinkedList[BigInt] // careful with that lazy
     if (program.equals(BigInt.apply(0)))
       return result
-    val pair = decodeDoubleNumToPair(program)
+    val pair = decodeDoublePair(program)
     result += pair._1
-    result ++= decodeNumToList(pair._2)
-    result
-  }
-
-  def decodeProgram(program: String) = {
-    val result = new LinkedList[Instruction]
-    lazy val list = decodeNumToList(BigInt.apply(program))
-
-    list.foreach(elem => result += decodeInstruction(elem))
-    instructions = result.toList
+    result ++= decodeList(pair._2)
     result
   }
 
   private def decodeInstruction(instruction: BigInt): Instruction = {
     if (instruction.equals(BigInt.apply(0)))
       return new HaltNode
-    val pair = decodeDoubleNumToPair(instruction)
-    if(pair._1 % 2 == 0)
+    val pair = decodeDoublePair(instruction)
+    if (pair._1 % 2 == 0)
       return new IncrementNode(new Register((pair._1 / 2).toInt), new Label(pair._2.toInt))
-    val pairLabels = decodeSingleNumToPair(pair._2)
+    val pairLabels = decodeSinglePair(pair._2)
 
-    new DecrementNode(new Register(((pair._1 - 1)/2).toInt),
-                      new Label(pairLabels._1.toInt),
-                      new Label(pairLabels._2.toInt))
+    new DecrementNode(new Register(((pair._1 - 1) / 2).toInt),
+      new Label(pairLabels._1.toInt),
+      new Label(pairLabels._2.toInt))
   }
+
+  def decodeProgram(program: String) = {
+    val result = new LinkedList[Instruction]
+    lazy val list = decodeList(BigInt.apply(program))
+
+    list.foreach(elem => result += decodeInstruction(elem))
+    instructions = new LinkedList[Instruction](result)
+    result
+  }
+
+  def encodeDoublePair(pair: (BigInt, BigInt)) = (BigInt.apply(2) ^ pair._1) * (pair._2 * 2 + 1)
+
+  def encodeSinglePair(pair: (BigInt, BigInt)) = encodeDoublePair(pair) - 1
+
+  def encodeList(list: LinkedList[BigInt]): BigInt = {
+    if (list.isEmpty)
+      return BigInt.apply(0)
+    encodeDoublePair(list.head, encodeList(list.tail()))
+  }
+
+  def encodeInstruction(instruction: Instruction) = {
+    instruction match {
+      case instruction: HaltNode => BigInt.apply(0)
+      case instruction: IncrementNode =>
+        encodeDoublePair(BigInt.apply(instruction.register.index * 2), BigInt.apply(instruction.next.index))
+      case instruction: DecrementNode =>
+        encodeDoublePair(BigInt.apply(instruction.register.index * 2 + 1),
+          encodeSinglePair(BigInt.apply(instruction.possible.index),
+                           BigInt.apply(instruction.impossible.index)))
+    }
+  }
+
+  def encodeProgram(instructions: LinkedList[Instruction]) = {
+    val listNum = new LinkedList[BigInt]
+    instructions.foreach(elem => listNum += encodeInstruction(elem))
+    encodeList(listNum)
+
+  }
+
 
 }

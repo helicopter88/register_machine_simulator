@@ -227,7 +227,7 @@ class LinkedList[T] extends mutable.Iterable[T] {
     * returns all the elements in the list minus the first one
     * @return a buffer containing the tail of the list
     */
-  override def tail() = iterator.drop(1).toBuffer
+  override def tail() = new LinkedList[T](iterator.drop(1).toBuffer)
 
   /**
     * @return the size of the list

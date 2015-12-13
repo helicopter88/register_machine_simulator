@@ -14,7 +14,7 @@ class IncrementNode(val register: Register, val next: Label) extends Instruction
     else
       RegisterMachine.regMachine.update(register, stateOp.get + 1)
 
-    if (Instructions.instructions.isDefinedAt(next.index)) {
+    if (Instructions.instructions.size < next.index) {
       val nextInstruction = Instructions.instructions.apply(next.index)
       nextInstruction.execute()
     } else

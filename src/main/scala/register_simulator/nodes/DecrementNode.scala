@@ -23,7 +23,8 @@ class DecrementNode(val register: Register, val possible: Label, val impossible:
   }
 
   private def executeNextLabel(next: Label) = {
-    if (Instructions.instructions.isDefinedAt(next.index)) {
+
+    if (Instructions.instructions.size < next.index) {
       val nextInstruction = Instructions.instructions.apply(next.index)
       nextInstruction.execute()
     } else
