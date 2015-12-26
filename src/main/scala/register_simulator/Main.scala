@@ -2,18 +2,18 @@ package register_simulator
 
 
 import java.io.StringReader
-import javax.swing.UIManager
 
-import org.antlr.v4.runtime.{RecognitionException, ANTLRInputStream, CommonTokenStream}
+import org.antlr.v4.runtime.{ANTLRInputStream, CommonTokenStream, RecognitionException}
 import register_simulator.nodes.Instruction
 import register_simulator.utils.{Decoder, Encoder, LinkedList}
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+
 import scala.swing.Dialog.Message
 import scala.swing._
 
 object Main extends SimpleSwingApplication {
   private val input = new TextArea() {
     columns = 10
+    rows = 10
   }
   private val button = new Button {
     text = "Simulate"
@@ -23,12 +23,11 @@ object Main extends SimpleSwingApplication {
       }
     }
   }
-  private val flowPanel = new FlowPanel(new swing.Label("Input"), input, button)
+  private val flowPanel = new FlowPanel(new swing.Label("Input"), new ScrollPane(input), button)
 
   def top = new MainFrame() {
-    UIManager.setLookAndFeel(new WindowsLookAndFeel)
+    resizable = true
     title = "Register simulator"
-    preferredSize = new Dimension(400, 400)
     contents = flowPanel
   }
 
@@ -71,6 +70,15 @@ object Main extends SimpleSwingApplication {
     }
     stringBuilder.append("Final register state:\n")
     stringBuilder.append(RegisterMachine.regMachine.mkString(","))
-    Dialog.showMessage(title = "Simulation output", message = stringBuilder.toString())
+    val textArea = new TextArea() {
+      text = stringBuilder.toString()
+      editable = false
+    }
+    val dialog = new Dialog() {
+      title = "Simulation Output"
+      centerOnScreen()
+      contents = new ScrollPane(textArea)
+    }
+    dialog.open()
   }
 }
