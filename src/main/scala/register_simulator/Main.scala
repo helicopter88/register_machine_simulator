@@ -66,7 +66,9 @@ object Main extends SimpleSwingApplication {
       // If we get a stack overflow error, it probably means
       // some label was recursively calling itself directly or indirectly roughly 65k times
       // it means that the program is looping
-      case e: StackOverflowError => stringBuilder.append("Infinite loop during execution.\n")
+      case e: StackOverflowError =>
+        stringBuilder.append("Infinite loop during execution.\n")
+        Dialog.showMessage(message = s"Infinite loop in execution", messageType = Dialog.Message.Warning)
     }
     stringBuilder.append("Final register state:\n")
     stringBuilder.append(RegisterMachine.regMachine.mkString(","))
