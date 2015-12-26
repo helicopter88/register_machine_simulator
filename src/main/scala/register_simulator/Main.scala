@@ -36,7 +36,7 @@ object Main {
     parseArgs(args)
     if (encode) {
       if (fileName == null)
-        fileName = new ANTLRInputStream()
+        fileName = new ANTLRInputStream(System.in)
       val tokens = new CommonTokenStream(new RegisterSimulatorLexer(fileName))
       val fileParser = new RegisterSimulatorParser(tokens)
       val registerVisitor = new RegisterVisitor
@@ -45,7 +45,7 @@ object Main {
     }
 
     if (decode) {
-      val decodedInstructions = Decoder.decodeProgram(number)
+      lazy val decodedInstructions = Decoder.decodeProgram(number)
       println("Decoded Instructions:")
       // Use zipWithIndex so that we can access both the index and the instruction
       // to print them neatly
