@@ -6,7 +6,7 @@ class DecrementNode(val register: Register, val possible: Label, val impossible:
 
   override def toString = s"$register- -> $possible, $impossible"
 
-  override def execute(): Unit = {
+  override def execute() = {
     var stateOp = RegisterMachine.regMachine.get(register)
 
     if (stateOp.isEmpty){

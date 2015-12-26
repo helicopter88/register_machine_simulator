@@ -7,5 +7,5 @@ class HaltNode extends Instruction {
 
   override def toString = "HALT"
 
-  override def execute() = {}
+  override def execute() = ""
 }

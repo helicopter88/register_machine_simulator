@@ -4,13 +4,13 @@ import register_simulator.{Instructions, Label}
 
 trait Instruction {
 
-  def execute()
+  def execute(): String
 
-  protected def executeNextLabel(next: Label) = {
+  protected def executeNextLabel(next: Label): String = {
     if (Instructions.instructions.size > next.index) {
       val nextInstruction = Instructions.instructions.apply(next.index)
       nextInstruction.execute()
     } else
-      println("Attempted to access undefined label")
+      "Attempted to access undefined label\n"
   }
 }

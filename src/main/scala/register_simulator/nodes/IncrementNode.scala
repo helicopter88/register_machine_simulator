@@ -6,7 +6,7 @@ class IncrementNode(val register: Register, val next: Label) extends Instruction
 
   override def toString = s"$register+ -> $next"
 
-  override def execute(): Unit = {
+  override def execute() = {
     lazy val stateOp = RegisterMachine.regMachine.get(register)
 
     if (stateOp.isEmpty)
