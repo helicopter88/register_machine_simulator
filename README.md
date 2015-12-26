@@ -8,10 +8,10 @@ It uses Swing for the (very simple) UI
   You will get back a dialog with the decoded instructions and the execution output
 
 * with a list of instructions:
- The syntax for an instruction is:
-```L#: INSTRUCTION;```
-The supported instructions are:
-*```R#+ -> L#``` that will incremement the register # and then go to the specified label
-*```R#- -> L#, L#``` that will try to decrement the register #, if successful jump to the first label specified, else to the second one
-*```HALT``` that will halt the execution of the program
+   The syntax for an instruction is:
+   ```L#: INSTRUCTION;```
+   The supported instructions are:
+   * ```R#+ -> L#``` that will incremement the register # and then go to the specified label
+   * ```R#- -> L#, L#``` that will try to decrement the register #, if successful jump to the first label specified, else to the second one
+   * ```HALT``` that will halt the execution of the program
 
