@@ -5,12 +5,12 @@
 
     <groupId>register_simulator</groupId>
     <artifactId>simulator</artifactId>
-    <version>0.1-BETA</version>
+    <version>0.2-BETA</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
         <scala.version>2.11.7</scala.version>
         <scala.version.tools>2.11</scala.version.tools>
     </properties>
@@ -38,7 +38,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <!-- this is so we don't end with a compile error in maven-compiler-plugin -->
@@ -55,7 +55,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.3</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -94,19 +94,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.scalacheck</groupId>
             <artifactId>scalacheck_${scala.version.tools}</artifactId>
-            <version>1.11.4</version>
+            <version>1.12.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.version.tools}</artifactId>
-            <version>2.2.0</version>
+            <version>2.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -118,6 +118,11 @@
             <groupId>org.scalafx</groupId>
             <artifactId>scalafx_2.11</artifactId>
             <version>8.0.60-R9</version>
+        </dependency>
+        <dependency>
+	    <groupId>org.scala-lang</groupId>
+	    <artifactId>scala-swing</artifactId>
+	    <version>2.11.0-M7</version>
         </dependency>
     </dependencies>
 </project>
