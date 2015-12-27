@@ -32,55 +32,83 @@ object Main extends SimpleSwingApplication {
   }
 
   def simulate(text: String) {
-    val stringBuilder = new StringBuilder("")
+
+    val decodeLabel = new swing.Label()
+    val executeLabel = new swing.Label("Execution output")
+    val registerLabel = new swing.Label("Final register state")
+    registerLabel.horizontalAlignment = Alignment.Leading
+    val registerState = new StringBuilder("")
+    val decodeOutput = new TextArea()
+    decodeOutput.editable = false
     text match {
       case empty if text.isEmpty =>
         Dialog.showMessage(messageType = Message.Error, title = "Error", message = "Please input something")
         return
       case number if text.matches("[0-9]+") =>
-        lazy val decodedInstructions = Decoder.decodeProgram(number)
-        stringBuilder.append("Decoded Instructions:\n")
-        // Use zipWithIndex so that we can access both the index and the instruction
-        // to print them neatly
-        decodedInstructions.zipWithIndex.foreach(pair => stringBuilder.append(s"L${pair._2}: ${pair._1}\n"))
+        decodeLabel.text = "Decoded Instructions"
+        decodeText(decodeOutput, number)
 
       case program =>
-        val fileName = new ANTLRInputStream(new StringReader(input.text))
-        try {
-          val tokens = new CommonTokenStream(new RegisterSimulatorLexer(fileName))
-          val fileParser = new RegisterSimulatorParser(tokens)
-          val registerVisitor = new RegisterVisitor
-          Instructions.instructions = new LinkedList[Instruction](registerVisitor.visit(fileParser.program()))
-          stringBuilder.append(s"Encoded instructions:\n ${Encoder.encodeProgram(Instructions.instructions)}")
-        } catch {
-          case e: RecognitionException =>
-            Dialog.showMessage(messageType = Message.Error, title = "Error", message = "Error while parsing input text")
-        }
+        encodeProgram(registerState)
     }
 
 
-    stringBuilder.append("Execution output:\n")
+    val executionOutput = new TextArea()
+    executeProgram(registerState, executionOutput)
+    val textArea = new TextArea() {
+      text = registerState.toString()
+      editable = false
+    }
+    val dialogContents = new FlowPanel(decodeLabel,
+      new ScrollPane(decodeOutput),
+      executeLabel,
+      new ScrollPane(executionOutput),
+      registerLabel,
+      new ScrollPane(textArea))
+    val dialog = new Dialog() {
+      title = "Simulation Output"
+      centerOnScreen()
+      contents = dialogContents
+    }
+    dialog.open()
+  }
+
+  def executeProgram(registerState: StringBuilder, executionOutput: TextArea): Unit = {
+    executionOutput.editable = false
     try {
-      stringBuilder.append(Instructions.instructions.head.execute())
+      executionOutput.append(Instructions.instructions.head.execute())
+      executionOutput.append("Execution terminated")
     } catch {
       // If we get a stack overflow error, it probably means
       // some label was recursively calling itself directly or indirectly roughly 65k times
       // it means that the program is looping
       case e: StackOverflowError =>
-        stringBuilder.append("Infinite loop during execution.\n")
+        executionOutput.append("Infinite loop during execution.\n")
         Dialog.showMessage(message = s"Infinite loop in execution", messageType = Dialog.Message.Warning)
     }
-    stringBuilder.append("Final register state:\n")
-    stringBuilder.append(RegisterMachine.regMachine.mkString(","))
-    val textArea = new TextArea() {
-      text = stringBuilder.toString()
-      editable = false
+    if(RegisterMachine.regMachine.isEmpty)
+      registerState.append("No register was used during execution")
+    registerState.append(RegisterMachine.regMachine.mkString(","))
+  }
+
+  def encodeProgram(registerState: StringBuilder): Unit = {
+    val fileName = new ANTLRInputStream(new StringReader(input.text))
+    try {
+      val tokens = new CommonTokenStream(new RegisterSimulatorLexer(fileName))
+      val fileParser = new RegisterSimulatorParser(tokens)
+      val registerVisitor = new RegisterVisitor
+      Instructions.instructions = new LinkedList[Instruction](registerVisitor.visit(fileParser.program()))
+      registerState.append(s"Encoded instructions:\n ${Encoder.encodeProgram(Instructions.instructions)}")
+    } catch {
+      case e: RecognitionException =>
+        Dialog.showMessage(messageType = Message.Error, title = "Error", message = "Error while parsing input text")
     }
-    val dialog = new Dialog() {
-      title = "Simulation Output"
-      centerOnScreen()
-      contents = new ScrollPane(textArea)
-    }
-    dialog.open()
+  }
+
+  def decodeText(decodeOutput: TextArea, number: String): Unit = {
+    lazy val decodedInstructions = Decoder.decodeProgram(number)
+    // Use zipWithIndex so that we can access both the index and the instruction
+    // to print them neatly
+    decodedInstructions.zipWithIndex.foreach(pair => decodeOutput.append(s"L${pair._2}: ${pair._1}\n"))
   }
 }
